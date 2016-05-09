@@ -14,7 +14,7 @@ object Algos {
   type TrueValue = Double
   type Accuracy = Double
 
-  def costFunciton(input: List[(PredictedValue, TrueValue)]): Accuracy = {
+  def costFunction(input: List[(PredictedValue, TrueValue)]): Accuracy = {
     val multipler = 0.5 // to keep the math simple when taking the derivative
     val exponent = 2 //to keep the answer positive
 

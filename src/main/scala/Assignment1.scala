@@ -11,7 +11,10 @@ object Assignment1 {
     * */
   def vectorMultiplication(featureVector: List[Double], weights: List[Double]): Double = {
     featureVector.zip(weights).map{ case(f, w) => f * w }.sum
-//    featureVector.zip(weights).foldLeft(0.0){ case (accumulator, (f, w)) => (f * w) + accumulator }
+  }
+
+  def vectorScalarMultiplication(featureVector: List[Double], weight: Double): List[Double] = {
+    featureVector.map{ _ * weight }
   }
 
   def computeCost(X:List[List[Double]], y:List[Double], theta:List[Double]):Double = {
@@ -20,26 +23,29 @@ object Assignment1 {
     .5 * squaredCosts / trainingExamplesCount
   }
 
-  def derivitiveOfCost(
+  def gradientDescent(
                         X:List[List[Double]],
                         y:List[Double],
-                        theta:List[Double]
+                        thetas:List[Double],
+                        learningRate:Double
                       ):List[Double] = {
-    X.zip(y).map{
-      case(featureVector, label) =>
-        featureVector.map(
-          feature => feature*(vectorMultiplication(featureVector, theta) - label)
-        )
-    }.map( d => d.sum/d.length)
+
+    val gradientOfCostFunction = X.zip(y).map{
+      case (featureVector, label) =>
+        featureVector.map{ feature => feature * (vectorMultiplication(featureVector, thetas) - label) }
+    }.transpose.map(featureType => featureType.sum/featureType.length)
+    println(gradientOfCostFunction)
+    thetas.zip(gradientOfCostFunction).map{ case (theta, gradient) => theta - learningRate * gradient}
   }
 
-  def gradientDecent(X:List[List[Double]], y:List[Double], originalThetas:List[Double], alpha:Double, numberOfIterations:Int) = {
+  def gradientDescentLoop(X:List[List[Double]], y:List[Double], originalThetas:List[Double], alpha:Double, numberOfIterations:Int) = {
 
     @tailrec
     def go(thetas:List[Double], numberOfIterationsLeft:Int):List[Double] = {
       val cost = computeCost(X, y, thetas)
       println(cost)
-      go(derivitiveOfCost(X, y, thetas), numberOfIterations - 1)
+      if (numberOfIterationsLeft == 0) thetas
+      else go(gradientDescent(X, y, thetas, alpha), numberOfIterationsLeft - 1)
     }
 
     go(originalThetas, numberOfIterations)
